@@ -35,7 +35,6 @@ tectonic structural-rt-abstract.tex
 ## TODO before submission
 
 - Confirm co-authors and affiliation city/country (placeholders/TODOs in the tex).
-- Decide the final title (dropping "Dispatch" from the feature name is under discussion).
 - Re-verify the measured numbers (tests, code size, compile time) against the
   implementation PR head at camera-ready time.
 - Reclaim the two lines currently spilling onto page 3.

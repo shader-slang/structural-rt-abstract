@@ -1,4 +1,4 @@
-% Extended abstract for the structural ray-tracing dispatch work.
+% Extended abstract for the structural ray tracing work.
 % Built with the ACM SIGGRAPH template (acmart, sigconf) in draft
 % (nonacm) mode, since no venue-specific rights block applies yet.
 %
@@ -40,7 +40,7 @@
 
 \begin{document}
 
-\title{Structural Ray-Tracing Dispatch in Slang: One Pipeline API for
+\title{Structural Ray Tracing in Slang: One Pipeline API for
 D3D12, Vulkan, OptiX, and Metal}
 
 \author{Kai Zhang}
@@ -59,8 +59,8 @@ free-standing stage entry points dispatched through a host-built shader
 binding table (SBT), while Metal has no native \emph{miss} or
 \emph{closesthit} stages and no complete SBT record indexing. On every API, a trace call's reachable
 programs are invisible to the shader compiler, leaving that boundary
-unchecked. We present \emph{structural ray-tracing
-dispatch}, a work-in-progress extension to Slang in which the shader
+unchecked. We present \emph{structural ray tracing}, a
+work-in-progress extension to Slang in which the shader
 declares a \emph{trace program schema} --- the finite, typed set of hit
 groups, \emph{miss} shaders, and \emph{callable} shaders a trace can
 reach --- while
@@ -261,7 +261,7 @@ pipeline and SBT.
 \begin{figure}
   \centering
   \includegraphics[width=0.52\columnwidth]{figures/cornell-demo.png}
-  \caption{Cornell box rendered through structural dispatch: one
+  \caption{Cornell box rendered through structural ray tracing: one
   $\sim$240-line Slang shader set compiles unmodified to SPIR-V
   (Vulkan), DXIL (D3D12), OptiX/CUDA, and MSL (Metal); headless renders
   are byte-for-byte identical (SHA-256) across the Vulkan, D3D12, and
