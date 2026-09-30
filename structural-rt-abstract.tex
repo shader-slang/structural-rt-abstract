@@ -174,8 +174,8 @@ rather than free-standing entry points (Listing~\ref{lst:api}).
 
 \begin{lstlisting}[float=tb,label={lst:api},caption={The new API surface.
 A context fixes the payload, record, and primitive types; the schema
-lists which programs exist; the trace call is checked against the
-schema.}]
+lists which programs exist; one typed descriptor binds the whole trace
+program; the trace call is checked against the schema.}]
 import slang.raytracing; // experimental module
 
 struct RadianceHitContext : rt::IHitContext
@@ -207,7 +207,13 @@ struct SceneSchema : rt::ITraceProgramSchema
     typealias CallableShaders = rt::NoCallableShaders;
 }
 
-// The payload type selects the schema's payload partition.
+// One binding point for the whole trace program: on D3D12,
+// Vulkan, and OptiX it lowers to no shader-visible resources;
+// on Metal, to its function tables and record buffer.
+rt::AccelerationStructure scene;
+rt::TraceProgramDescriptor<SceneSchema> program;
+
+// The payload type selects the matching programs in the schema.
 rt::RayTracer<SceneSchema> tracer;
 RadiancePayload p = {};
 tracer.trace(desc, scene, program, p);
@@ -232,12 +238,13 @@ types are diagnosed at compile time rather than at pipeline creation or
 runtime, and that the reachable set stays visible while maintaining and
 debugging a large ray-tracing codebase.
 
-\textbf{Payload partitions.} The payload is a property of each hit or
-\emph{miss} context, so one schema and one physical SBT serve several
-payload
-types (e.g., a radiance payload and a shadow payload) without
-duplication; a trace call selects its partition by the payload type it
-passes.
+\textbf{One typed binding point.} The shader binds the whole trace
+program as a single \texttt{TraceProgramDescriptor<Schema>}, closing
+the resource mismatch: on D3D12, Vulkan, and OptiX the descriptor
+lowers to no shader-visible resources --- the host builds the native
+SBT exactly as today --- while on Metal the same declaration lowers to
+the intersection-function tables, visible-function tables, and record
+buffer that Metal requires, bound through reflection.
 
 \textbf{Native where native exists, synthesized where it does not.} On
 D3D12, Vulkan, and OptiX, stage structs lower to ordinary native entry
@@ -286,8 +293,7 @@ suites pass on all of these backends --- including 16 native Metal
 scenarios covering curves, motion, and multi-level acceleration
 structures. A port of a Falcor~2--based renderer exercises
 the design at mid-size-renderer scale: four ray-tracing consumers ---
-including a reference path tracer holding two payload partitions in one
-schema --- produce byte-identical output against the existing path on
+including a reference path tracer whose schema serves two payload types --- produce byte-identical output against the existing path on
 Vulkan, pass functional validation on both D3D12 and Vulkan, and
 complete separate-compilation, reflection, and linking checks on
 Metal.
