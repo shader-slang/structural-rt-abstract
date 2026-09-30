@@ -56,13 +56,14 @@ The Slang shading language compiles one shader codebase to all major
 GPU APIs, yet pipeline ray tracing still cannot be written once and
 compiled to every target: D3D12, Vulkan, and OptiX share a model of
 free-standing stage entry points dispatched through a host-built shader
-binding table (SBT), while Metal has no native miss or closest-hit
-stages and no complete SBT record indexing. On every API, a trace call's reachable
+binding table (SBT), while Metal has no native \emph{miss} or
+\emph{closesthit} stages and no complete SBT record indexing. On every API, a trace call's reachable
 programs are invisible to the shader compiler, leaving that boundary
 unchecked. We present \emph{structural ray-tracing
 dispatch}, a work-in-progress extension to Slang in which the shader
 declares a \emph{trace program schema} --- the finite, typed set of hit
-groups, miss shaders, and callable shaders a trace can reach --- while
+groups, \emph{miss} shaders, and \emph{callable} shaders a trace can
+reach --- while
 the host retains full ownership of the physical SBT. The schema buys both portability and
 compile-time checking: the compiler preserves native dispatch on D3D12,
 Vulkan, and OptiX while synthesizing Metal's missing dispatch machinery,
@@ -114,23 +115,28 @@ record through the same index calculation:
 \underbrace{\mathit{sbtOffset}}_{\text{trace call}}
 $}
 \end{equation*}
-A miss record is instead selected directly by $\mathit{missIndex}$, and
-a callable record by the explicit index passed to the call; the selected
-stages then dispatch natively.
+A \emph{miss} record is instead selected directly by
+$\mathit{missIndex}$, and a \emph{callable} record by the explicit index
+passed to the call; the selected stages then dispatch natively.
 
 Metal overlaps with only the traversal half of this model. During
-traversal it does dispatch through a function table: triangle and
-procedural intersection functions --- Metal's any-hit-style filters ---
-are selected by the sum of a per-instance and a per-geometry table
-offset. But the trace call contributes no $\mathit{sbtStride}$ or
-$\mathit{sbtOffset}$ analogue to that index, the dispatched functions
-can only accept or reject candidate hits, and miss and closest-hit have
-no stages at all: they are ordinary control flow the shader author
-writes after \texttt{intersect()} returns. Three concrete gaps remain:
+traversal it does dispatch through a function table: each
+\emph{candidate hit} --- a tentative intersection not yet accepted as
+the closest --- can invoke a triangle or procedural intersection
+function, Metal's \emph{anyhit}-style filter, selected by the sum of a
+per-instance and a per-geometry table offset. But the trace call
+contributes no $\mathit{sbtStride}$ or $\mathit{sbtOffset}$ analogue to
+that index, the dispatched functions can only accept or reject their
+candidate, and \emph{miss}, \emph{closesthit}, and \emph{callable} have
+no stages at all: \emph{miss} and \emph{closesthit} logic is ordinary
+control flow after \texttt{intersect()} returns, and a \emph{callable}
+is an explicit function call the shader makes itself. Three concrete
+gaps remain:
 
 \begin{itemize}
-\item \textbf{Dispatch-model gap.} No native dispatch reaches miss or
-  closest-hit code, and the traversal table index is not the full SBT
+\item \textbf{Dispatch-model gap.} No native dispatch reaches
+  \emph{miss} or \emph{closesthit} code, and the traversal table index
+  is not the full SBT
   record calculation: the trace-to-program mapping lives only in host
   pipeline setup.
 \item \textbf{Resource mismatch.} Metal's function tables are
@@ -150,7 +156,8 @@ late --- if at all.
 
 The design rests on one ownership split. The \textbf{shader owns the
 schema}: a trace program schema declares the finite set of executable
-hit groups, miss shaders, and callable shaders, plus the types of their
+hit groups, \emph{miss} shaders, and \emph{callable} shaders, plus the
+types of their
 payloads, hit attributes, and per-record data. The \textbf{host owns the
 SBT instance}: record count, order, program selection, and record bytes
 remain runtime host decisions, exactly as in the native APIs. Stage
@@ -209,15 +216,17 @@ reflected function index) itself: one entry may back records 1, 4, and
 \textbf{Trace calls are no longer opaque.} Natively, the programs a
 trace call may invoke are recorded only in host pipeline setup ---
 invisible to the shader compiler. The schema gives each trace call a
-deliberately weak, typed connection to its candidate hit, miss, and
-callable programs: weak enough that the host still owns record
+deliberately weak, typed connection to its reachable hit-group,
+\emph{miss}, and \emph{callable} programs: weak enough that the host
+still owns record
 placement, strong enough that mismatched payload and hit-attribute
 types are diagnosed at compile time rather than at pipeline creation or
 runtime, and that the reachable set stays visible while maintaining and
 debugging a large ray-tracing codebase.
 
 \textbf{Payload partitions.} The payload is a property of each hit or
-miss context, so one schema and one physical SBT serve several payload
+\emph{miss} context, so one schema and one physical SBT serve several
+payload
 types (e.g., a radiance payload and a shadow payload) without
 duplication; a trace call selects its partition by the payload type it
 passes.
