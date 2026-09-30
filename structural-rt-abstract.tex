@@ -118,15 +118,21 @@ A miss record is instead selected directly by $\mathit{missIndex}$, and
 a callable record by the explicit index passed to the call; the selected
 stages then dispatch natively.
 
-Metal implements none of this. It exposes traversal and intersection
-functions, but miss and closest-hit logic are ordinary post-trace
-control flow, and its intersection-function-table index is not the full
-SBT record calculation. Three concrete gaps follow:
+Metal overlaps with only the traversal half of this model. During
+traversal it does dispatch through a function table: triangle and
+procedural intersection functions --- Metal's any-hit-style filters ---
+are selected by the sum of a per-instance and a per-geometry table
+offset. But the trace call contributes no $\mathit{sbtStride}$ or
+$\mathit{sbtOffset}$ analogue to that index, the dispatched functions
+can only accept or reject candidate hits, and miss and closest-hit have
+no stages at all: they are ordinary control flow the shader author
+writes after \texttt{intersect()} returns. Three concrete gaps remain:
 
 \begin{itemize}
-\item \textbf{Dispatch-model gap.} There is no native SBT record
-  dispatch to compile to: the trace-to-program mapping lives only in
-  host pipeline setup.
+\item \textbf{Dispatch-model gap.} No native dispatch reaches miss or
+  closest-hit code, and the traversal table index is not the full SBT
+  record calculation: the trace-to-program mapping lives only in host
+  pipeline setup.
 \item \textbf{Resource mismatch.} Metal's function tables are
   shader-visible resources that must be declared and bound; the D3D12
   and Vulkan SBT has no shader-side binding point at all.
