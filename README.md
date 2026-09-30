@@ -38,4 +38,4 @@ tectonic structural-rt-abstract.tex
 - Decide the final title (dropping "Dispatch" from the feature name is under discussion).
 - Re-verify the measured numbers (tests, code size, compile time) against the
   implementation PR head at camera-ready time.
-- Reclaim the two lines currently spilling onto page 3, or accept the
+- Reclaim the two lines currently spilling onto page 3.
