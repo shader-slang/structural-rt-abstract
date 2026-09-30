@@ -103,8 +103,8 @@ Every native pipeline ray-tracing API couples three parties through
 untyped conventions. The shader declares free-standing stage entry
 points; the host builds an SBT whose records name those entry points and
 carry per-record data; and a trace call selects records at runtime. On
-D3D12, Vulkan, and OptiX the driver or hardware evaluates the same
-record-index calculation:
+D3D12, Vulkan, and OptiX the driver or hardware selects each hit-group
+record through the same index calculation:
 \begin{equation*}
 \resizebox{\columnwidth}{!}{$
 \underbrace{\mathit{recordIndex}}_{\text{driver/HW}} =
@@ -114,7 +114,9 @@ record-index calculation:
 \underbrace{\mathit{sbtOffset}}_{\text{trace call}}
 $}
 \end{equation*}
-and dispatches the selected miss or hit-group stages natively.
+A miss record is instead selected directly by $\mathit{missIndex}$, and
+a callable record by the explicit index passed to the call; the selected
+stages then dispatch natively.
 
 Metal implements none of this. It exposes traversal and intersection
 functions, but miss and closest-hit logic are ordinary post-trace
@@ -219,7 +221,7 @@ D3D12, Vulkan, and OptiX, stage structs lower to ordinary native entry
 points and native SBT dispatch. On Metal, the same schema drives
 synthesis of per-payload intersection-function-table dispatchers,
 visible-function tables, a compiler-owned record buffer whose lookup
-evaluates the standard record-index formula at runtime, and fully
+evaluates the standard hit-record index formula at runtime, and fully
 inferred \texttt{[[intersection(...)]]} tag lists.
 
 \textbf{Separate compilation.} A schema section may be left open, to be
