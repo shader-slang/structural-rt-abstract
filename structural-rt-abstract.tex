@@ -59,8 +59,8 @@ free-standing stage entry points dispatched through a host-built shader
 binding table (SBT), while Metal has no native \emph{miss} or
 \emph{closesthit} stages and no complete SBT record indexing. On every API, a trace call's reachable
 programs are invisible to the shader compiler, leaving that boundary
-unchecked. We present \emph{structural ray tracing}, a
-work-in-progress extension to Slang in which the shader
+unchecked. We present \emph{structural ray tracing}, an experimental
+Slang module in which the shader
 declares a \emph{trace program schema} --- the finite, typed set of hit
 groups, \emph{miss} shaders, and \emph{callable} shaders a trace can
 reach --- while
