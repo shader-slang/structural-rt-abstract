@@ -213,7 +213,7 @@ RadiancePayload p = {};
 tracer.trace(desc, scene, program, p);
 \end{lstlisting}
 
-\textbf{Structural dispatch without a false slot model.} A schema entry
+\textbf{Schema entries are code, not slots.} A schema entry
 identifies executable code --- it never claims a physical SBT record,
 and no record index is assigned in shader source. The host still
 decides record count, record order, and which program each record runs,
@@ -306,8 +306,7 @@ already portable --- and excludes Shader Execution Reordering. The
 Falcor~2 Metal runtime path awaits pipeline ray-tracing support in
 Slang-RHI, and a port of Unreal Engine~5 is planned. The compiler
 cannot validate host-written SBT contents --- the same trust boundary as
-the native APIs, made explicit through reflection rather than hidden
-behind a source-level slot model.
+the native APIs, made explicit through reflection.
 
 Attendees will learn why Metal breaks the SBT dispatch model that DXR,
 Vulkan, and OptiX share; how declaring a typed schema in shader source
