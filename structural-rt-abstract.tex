@@ -71,7 +71,7 @@ and on every target it checks each trace call against its reachable
 programs. For example, passing a payload type none of them expects
 fails at compile time; on today's native APIs, the same mistake
 surfaces only when the GPU misreads the payload at runtime. A Cornell-box demo runs one Slang
-shader set on all four backends with no measurable GPU dispatch
+shader set on all of these APIs with no measurable GPU dispatch
 overhead, and a port of a Falcor~2--based renderer validates the design
 at mid-size-renderer scale.
 \end{abstract}
@@ -143,14 +143,21 @@ gaps remain:
   shader-visible resources that must be declared and bound; the D3D12
   and Vulkan SBT has no shader-side binding point at all.
 \item \textbf{Tag-inference gap.} Every reachable intersection function
-  must carry a compatible \texttt{[[intersection(...)]]} tag list, but
-  reachability is host knowledge.
+  must carry a compatible \texttt{[[intersection(...)]]} tag
+  list\footnote{Metal Shading Language Specification, version 4.1,
+  \S2.17.1 (Ray-Tracing Intersection Tags), \S5.1.6 (Intersection
+  Functions), and \S2.17.6 (Intersector Type): ``Intersection tags on
+  the intersector type must match their associated intersection
+  function \ldots\ or the behavior is undefined.''} --- the static
+  signature of the acceleration-structure features and per-primitive
+  data it may use --- but reachability is host knowledge.
 \end{itemize}
 
 The practical consequence: engines either write and maintain their
-pipeline ray-tracing shaders per platform, or skip Metal entirely. And on all four APIs, a trace call's reachable programs are
-invisible to the shader compiler, so mistakes at that boundary are
-caught late --- if ever.
+pipeline ray-tracing shaders per platform, or skip Metal entirely. And
+on every API, a trace call's reachable programs are invisible to the
+shader compiler, so mistakes at that boundary are caught late --- if
+ever.
 
 \section{Technical Approach and Key Contributions}
 
@@ -274,7 +281,7 @@ perf-measured. The cost is at compile time: roughly 44--47\% more compile wall t
 
 The in-progress compiler implementation ($\sim$52K lines across 325
 files) passes 401 dedicated compiler and runtime tests, and its runtime
-suites pass on all four backends --- including 16 native Metal
+suites pass on all of these backends --- including 16 native Metal
 scenarios covering curves, motion, and multi-level acceleration
 structures. A port of a Falcor~2--based renderer exercises
 the design at mid-size-renderer scale: four ray-tracing consumers ---
@@ -304,7 +311,7 @@ behind a source-level slot model.
 Attendees will learn why Metal breaks the SBT dispatch model that DXR,
 Vulkan, and OptiX share; how declaring a typed schema in shader source
 lets a compiler preserve native dispatch on three targets while
-synthesizing it on the fourth; what the compiler's trace checking can
+synthesizing it on Metal; what the compiler's trace checking can
 and cannot guarantee; and how a reflection-driven host workflow replaces
 per-platform SBT setup.
 
