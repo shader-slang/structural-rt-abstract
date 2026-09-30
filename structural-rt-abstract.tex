@@ -167,7 +167,7 @@ schema}: a trace program schema declares the finite set of executable
 hit groups, \emph{miss} shaders, and \emph{callable} shaders, plus the
 types of their
 payloads, hit attributes, and per-record data. The \textbf{host owns the
-SBT instance}: record count, order, program selection, and record bytes
+SBT instance}: record count, order, program layout, and record bytes
 remain runtime host decisions, exactly as in the native APIs. Stage
 logic is written as stateless structs implementing stage interfaces
 rather than free-standing entry points (Listing~\ref{lst:api}).
