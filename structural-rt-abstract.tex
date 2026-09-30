@@ -259,8 +259,8 @@ designated tag interface --- so independently compiled modules (e.g.,
 material plugins) contribute hit groups before final linking.
 
 \textbf{A reflection contract.} Hosts read exact target entry symbols,
-record layouts, and native ABI sizes from
-reflection --- a single source of truth for building each target's
+record layouts, and the payload and hit-attribute sizes pipeline
+creation requires from reflection --- a single source of truth for building each target's
 pipeline and SBT.
 
 \section{Results and Demonstrations}
