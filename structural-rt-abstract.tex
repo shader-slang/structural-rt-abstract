@@ -268,17 +268,18 @@ for building each target's pipeline and SBT.
 \begin{figure}
   \centering
   \includegraphics[width=0.52\columnwidth]{figures/cornell-demo.png}
-  \caption{Cornell box rendered through structural ray tracing: one
-  $\sim$240-line Slang shader set compiles unmodified to SPIR-V
-  (Vulkan), DXIL (D3D12), OptiX/CUDA, and MSL (Metal); headless renders
-  are byte-for-byte identical (SHA-256) across the Vulkan, D3D12, and
-  Metal runs, with matching checksums on OptiX.}
+  \caption{Cornell box path-traced through structural ray tracing
+  (4096 samples per pixel, eight bounces): a procedural glass sphere
+  --- a custom \emph{intersection} shader reporting custom hit
+  attributes --- with refraction, floor caustics, and multi-bounce
+  indirect lighting. One Slang shader set compiles unmodified to SPIR-V
+  (Vulkan), DXIL (D3D12), OptiX/CUDA, and MSL (Metal).}
   \label{fig:cornell}
 \end{figure}
 
 A standalone Cornell-box demo (Figure~\ref{fig:cornell}) compiles one
-$\sim$240-line Slang shader set unmodified to Vulkan and OptiX (Linux),
-D3D12 (Windows), and Metal (a direct Metal-cpp host consuming generated
+Slang shader set unmodified to Vulkan and OptiX (Linux), D3D12
+(Windows), and Metal (a direct Metal-cpp host consuming generated
 MSL on macOS). Median GPU dispatch time is identical to Slang's
 existing entry-point path --- the code path engines ship today --- on
 Vulkan (0.013\,ms) and D3D12 (0.035\,ms), and matches a hand-written
