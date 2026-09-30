@@ -223,9 +223,10 @@ tracer.trace(desc, scene, program, p);
 identifies executable code --- it never claims a physical SBT record,
 and no record index is assigned in shader source. The host still
 decides record count, record order, and which program each record runs,
-writing each record's native shader identifier (or, on Metal, its
-reflected function index) itself: one entry may back records 1, 4, and
-10{,}000, each with different record data.
+writing into each record a native shader identifier --- or, on Metal,
+the entry's reflected \emph{function index}, its position in the
+compiler-generated function tables. One entry may back records 1, 4,
+and 10{,}000, each with different record data.
 
 \textbf{Trace calls are no longer opaque.} Natively, the programs a
 trace call may invoke are recorded only in host pipeline setup ---
