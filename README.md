@@ -1,5 +1,7 @@
 # Structural Ray Tracing in Slang — Extended Abstract
 
+[![Abstract preview (page 1) — click for the full PDF](figures/abstract-page1.png)](structural-rt-abstract.pdf)
+
 A 1–2 page SIGGRAPH-style extended abstract (ACM `acmart`, `sigconf`) introducing
 Slang's structural ray-tracing work: a shader-declared *trace program schema* that
 makes one pipeline ray-tracing codebase compile to D3D12, Vulkan, OptiX, and Metal,
@@ -20,6 +22,7 @@ This is work in progress. Related artifacts:
 | `structural-rt-abstract.tex` | LaTeX source (acmart `sigconf`, `nonacm` draft mode) |
 | `structural-rt-abstract.pdf` | Built PDF |
 | `figures/cornell-demo.png` | Cornell-box render from the cross-platform demo (Figure 1) |
+| `figures/abstract-page1.png` | Page-1 render used as the README preview |
 | `figures/dispatch-model-gap.pdf` | Optional motivation figure (currently commented out in the tex) |
 
 ## Building
