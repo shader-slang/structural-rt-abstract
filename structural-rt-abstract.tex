@@ -213,7 +213,7 @@ RadiancePayload p = {};
 tracer.trace(desc, scene, program, p);
 \end{lstlisting}
 
-\textbf{Schema entries are code, not slots.} A schema entry
+\textbf{Schema entries are code, not records.} A schema entry
 identifies executable code --- it never claims a physical SBT record,
 and no record index is assigned in shader source. The host still
 decides record count, record order, and which program each record runs,
