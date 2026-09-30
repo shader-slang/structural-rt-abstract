@@ -138,22 +138,6 @@ pipeline ray-tracing shaders per platform, or skip Metal entirely. And on every 
 invisible to the shader compiler, so mistakes at that boundary surface
 late --- if at all.
 
-% A second, two-column figure illustrating the dispatch-model gap is
-% available (figures/dispatch-model-gap.pdf). It does not fit within the
-% two-page budget together with the code listing and the results figure;
-% uncomment the block below (and reference it as Figure~\ref{fig:gap} in
-% the paragraph above) if a third page is acceptable.
-%\begin{figure*}
-%  \centering
-%  \includegraphics[width=0.72\textwidth]{figures/dispatch-model-gap.pdf}
-%  \caption{The dispatch-model gap. Top: D3D12, Vulkan, and OptiX
-%  dispatch miss and hit-group stages natively through host-created SBT
-%  records selected by the record-index formula. Bottom: on Metal, miss
-%  and closest-hit dispatch are user-written post-trace control flow, so
-%  the trace-to-program mapping exists only on the host.}
-%  \label{fig:gap}
-%\end{figure*}
-
 \section{Technical Approach and Key Contributions}
 
 The design rests on one ownership split. The \textbf{shader owns the

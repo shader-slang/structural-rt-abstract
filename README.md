@@ -21,7 +21,6 @@ This is work in progress. Related artifacts:
 | `structural-rt-abstract.tex` | LaTeX source (acmart `sigconf`, `nonacm` draft mode) |
 | `structural-rt-abstract.pdf` | Built PDF |
 | `figures/cornell-demo.png` | Cornell-box render from the cross-platform demo (Figure 1) |
-| `figures/dispatch-model-gap.pdf` | Optional motivation figure (currently commented out in the tex) |
 
 ## Building
 
@@ -39,5 +38,4 @@ tectonic structural-rt-abstract.tex
 - Decide the final title (dropping "Dispatch" from the feature name is under discussion).
 - Re-verify the measured numbers (tests, code size, compile time) against the
   implementation PR head at camera-ready time.
-- Reclaim the two lines currently spilling onto page 3, or accept the two-figure
-  three-page variant (uncomment the `dispatch-model-gap` figure block in the tex).
+- Reclaim the two lines currently spilling onto page 3, or accept the
