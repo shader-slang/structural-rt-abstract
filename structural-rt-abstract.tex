@@ -314,13 +314,18 @@ Cross-platform demo:
 \url{https://github.com/kaizhangNV/structural-rt-cornell-demo}.}
 and we actively seek community feedback to stabilize the interface
 design --- there may be gaps our own validation cannot catch. The
-feature ships as an explicitly imported experimental module.
-The first version does not include Shader Execution Reordering (SER);
-we plan to extend the design to cover it in the near future. The
-Falcor~2 Metal runtime path awaits pipeline ray-tracing support in
-Slang-RHI, and a port of Unreal Engine~5 is planned. The compiler
-cannot validate host-written SBT contents --- the same trust boundary as
-the native APIs, made explicit through reflection.
+feature ships as an explicitly imported experimental module, and the
+compiler cannot validate host-written SBT contents --- the same trust
+boundary as the native APIs, made explicit through reflection.
+Remaining work:
+
+\begin{itemize}
+\item Metal pipeline ray-tracing support in Slang-RHI, so the
+  Falcor~2 port's Metal runtime path runs end to end.
+\item Shader Execution Reordering (SER) support in the schema design.
+\item An Unreal Engine~5 port, to exercise and stabilize the interface
+  at production scale.
+\end{itemize}
 
 Attendees will learn why Metal breaks the SBT dispatch model that DXR,
 Vulkan, and OptiX share; how declaring a typed schema in shader source
