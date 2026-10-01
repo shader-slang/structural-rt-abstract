@@ -71,8 +71,8 @@ and on every target it checks each trace call against its reachable
 programs. For example, passing a payload type none of them expects
 fails at compile time; on today's native APIs, the same mistake
 surfaces only when the GPU misreads the payload at runtime. A Cornell-box demo runs one Slang
-shader set on all of these APIs with no measurable GPU dispatch
-overhead, and a port of a Falcor~2--based renderer validates the design
+shader set on all of these APIs with output matching Slang's existing
+path, and a port of a Falcor~2--based renderer validates the design
 at mid-size-renderer scale.
 \end{abstract}
 
@@ -279,13 +279,14 @@ for building each target's pipeline and SBT.
 
 A standalone Cornell-box demo (Figure~\ref{fig:cornell}) compiles one
 Slang shader set unmodified to Vulkan and OptiX (Linux), D3D12
-(Windows), and Metal (a direct Metal-cpp host consuming generated
-MSL on macOS). Median GPU dispatch time is identical to Slang's
-existing entry-point path --- the code path engines ship today --- on
-Vulkan (0.013\,ms) and D3D12 (0.035\,ms), and matches a hand-written
-native Metal intersector within measurement noise on Apple~M4
-(0.088\,ms vs.\ 0.090\,ms); OptiX is validated functionally but was not
-perf-measured. The cost is at compile time: roughly 44--47\% more compile wall time.
+(Windows), and Metal (a direct Metal-cpp host consuming generated MSL
+on macOS), and renders the same scene through the structural path,
+Slang's existing entry-point path --- the code path engines ship today
+--- and, on Metal, a hand-written native implementation, with matching
+results on each backend. We deliberately report no performance numbers
+yet, since the implementation is still in progress; by construction we
+expect no runtime cost --- stage logic lowers to ordinary native entry
+points and native dispatch --- with the added work at compile time.
 
 The in-progress compiler implementation ($\sim$52K lines across 325
 files) passes 401 dedicated compiler and runtime tests, and its runtime

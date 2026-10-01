@@ -35,6 +35,6 @@ tectonic structural-rt-abstract.tex
 ## TODO before submission
 
 - Confirm co-authors and affiliation city/country (placeholders/TODOs in the tex).
-- Re-verify the measured numbers (tests, code size, compile time) against the
-  implementation PR head at camera-ready time.
+- Add performance measurements (runtime parity, compile-time cost) once the
+  implementation is final; they are deliberately omitted for now.
 - Reclaim the two lines currently spilling onto page 3.
