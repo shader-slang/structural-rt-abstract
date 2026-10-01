@@ -71,8 +71,9 @@ and on every target it checks each trace call against its reachable
 programs. For example, passing a payload type none of them expects
 fails at compile time; on today's native APIs, the same mistake
 surfaces only when the GPU misreads the payload at runtime. A Cornell-box demo runs one Slang
-shader set on all of these APIs with output matching Slang's existing
-path, and a port of a Falcor~2--based renderer validates the design
+shader set on all of these APIs with output matching Slang's legacy
+ray-tracing API, and a port of a Falcor~2--based renderer validates the
+design
 at mid-size-renderer scale.
 \end{abstract}
 
@@ -280,10 +281,10 @@ for building each target's pipeline and SBT.
 A standalone Cornell-box demo (Figure~\ref{fig:cornell}) compiles one
 Slang shader set unmodified to Vulkan and OptiX (Linux), D3D12
 (Windows), and Metal (a direct Metal-cpp host consuming generated MSL
-on macOS), and renders the same scene through the structural path,
-Slang's existing entry-point path --- the code path engines ship today
---- and, on Metal, a hand-written native implementation, with matching
-results on each backend. We deliberately report no performance numbers
+on macOS), and renders the same scene through the structural
+ray-tracing API, Slang's legacy ray-tracing API --- the entry-point
+path engines ship today --- and, on Metal, a hand-written native
+implementation, with matching results on each backend. We deliberately report no performance numbers
 yet, since the implementation is still in progress; by construction we
 expect no runtime cost --- stage logic lowers to ordinary native entry
 points and native dispatch --- with the added work at compile time.
@@ -294,7 +295,8 @@ suites pass on all of these backends --- including 16 native Metal
 scenarios covering curves, motion, and multi-level acceleration
 structures. A port of a Falcor~2--based renderer exercises
 the design at mid-size-renderer scale: four ray-tracing consumers ---
-including a reference path tracer whose schema serves two payload types --- produce byte-identical output against the existing path on
+including a reference path tracer whose schema serves two payload types
+--- produce byte-identical output against the legacy ray-tracing API on
 Vulkan, pass functional validation on both D3D12 and Vulkan, and
 complete separate-compilation, reflection, and linking checks on
 Metal.
