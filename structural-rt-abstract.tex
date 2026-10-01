@@ -284,10 +284,12 @@ Slang shader set unmodified to Vulkan and OptiX (Linux), D3D12
 on macOS), and renders the same scene through the structural
 ray-tracing API, Slang's legacy ray-tracing API --- the entry-point
 path engines ship today --- and, on Metal, a hand-written native
-implementation, with matching results on each backend. We deliberately report no performance numbers
-yet, since the implementation is still in progress; by construction we
-expect no runtime cost --- stage logic lowers to ordinary native entry
-points and native dispatch --- with the added work at compile time.
+implementation, with matching results on each backend. Early benchmarks
+show no runtime cost --- expected by construction, since the structural
+ray-tracing API introduces no code-generation difference from the
+legacy one --- and its renders are byte-identical to the legacy API's
+on the same backend. The one cost we do observe, as expected, is
+compile time; exact figures await the final implementation.
 
 The in-progress compiler implementation ($\sim$52K lines across 325
 files) passes 401 dedicated compiler and runtime tests, and its runtime
