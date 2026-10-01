@@ -293,8 +293,8 @@ legacy one --- and its renders are byte-identical to the legacy API's
 on the same backend. The one cost we do observe, as expected, is
 compile time; exact figures await the final implementation.
 
-The in-progress compiler implementation ($\sim$52K lines across 325
-files) passes 401 dedicated compiler and runtime tests, and its runtime
+The in-progress compiler implementation passes 401 dedicated compiler
+and runtime tests, and its runtime
 suites pass on all of these backends --- including 16 native Metal
 scenarios covering curves, motion, and multi-level acceleration
 structures. A port of a Falcor~2--based renderer exercises
