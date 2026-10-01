@@ -20,6 +20,7 @@ This is work in progress. Related artifacts:
 | --- | --- |
 | `structural-rt-abstract.tex` | LaTeX source (acmart `sigconf`, `nonacm` draft mode) |
 | `structural-rt-abstract.pdf` | Built PDF |
+| `references.bib` | BibTeX references (project links, MSL specification) |
 | `figures/cornell-demo.png` | Cornell-box render from the cross-platform demo (Figure 1) |
 
 ## Building

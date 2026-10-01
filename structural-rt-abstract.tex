@@ -144,15 +144,12 @@ gaps remain:
   shader-visible resources that must be declared and bound; the D3D12
   and Vulkan SBT has no shader-side binding point at all.
 \item \textbf{Tag-inference gap.} Every reachable intersection function
-  must carry a compatible \texttt{[[intersection(...)]]} tag
-  list\footnote{Metal Shading Language Specification, version 4.1,
-  \S2.17.1 (Ray-Tracing Intersection Tags), \S5.1.6 (Intersection
-  Functions), and \S2.17.6 (Intersector Type): ``Intersection tags on
-  the intersector type must match their associated intersection
-  function \ldots\ or the behavior is undefined.''} --- the static
-  signature of the traversal capabilities the function relies on and
-  the inputs it may consume --- but reachability is host knowledge, so
-  the compiler has no basis to infer those tag lists.
+  must carry a compatible \texttt{[[intersection(...)]]} tag list ---
+  the static signature of the traversal capabilities the function
+  relies on and the inputs it may consume; a tag mismatch is undefined
+  behavior~\cite[\S\S2.17.1, 5.1.6,
+  2.17.6]{msl-spec} --- but reachability is host knowledge, so the
+  compiler has no basis to infer those tag lists.
 \end{itemize}
 
 The practical consequence: engines either write and maintain their
@@ -280,7 +277,8 @@ for building each target's pipeline and SBT.
   \label{fig:cornell}
 \end{figure}
 
-A standalone Cornell-box demo (Figure~\ref{fig:cornell}) compiles one
+A standalone Cornell-box demo~\cite{rt-cornell-demo}
+(Figure~\ref{fig:cornell}) compiles one
 Slang shader set unmodified to Vulkan and OptiX (Linux), D3D12
 (Windows), and Metal (a direct Metal-cpp host consuming generated MSL
 on macOS), and renders the same scene through the structural
@@ -293,8 +291,8 @@ legacy one --- and its renders are byte-identical to the legacy API's
 on the same backend. The one cost we do observe, as expected, is
 compile time; exact figures await the final implementation.
 
-The in-progress compiler implementation passes 401 dedicated compiler
-and runtime tests, and its runtime
+The in-progress compiler implementation~\cite{rt-implementation} passes
+401 dedicated compiler and runtime tests, and its runtime
 suites pass on all of these backends --- including 16 native Metal
 scenarios covering curves, motion, and multi-level acceleration
 structures. A port of a Falcor~2--based renderer exercises
@@ -308,10 +306,7 @@ Metal.
 \section{Limitations and What Attendees Will Learn}
 
 This work is still experimental. The design proposal is an open draft
-awaiting review,\footnote{Proposal: \url{https://github.com/shader-slang/spec/pull/59}.
-Implementation: \url{https://github.com/shader-slang/slang/pull/12691}.
-Cross-platform demo:
-\url{https://github.com/kaizhangNV/structural-rt-cornell-demo}.}
+awaiting review~\cite{rt-proposal},
 and we actively seek community feedback to stabilize the interface
 design --- there may be gaps our own validation cannot catch. The
 feature ships as an explicitly imported experimental module, and the
@@ -333,5 +328,8 @@ lets a compiler preserve native dispatch on three targets while
 synthesizing it on Metal; what the compiler's trace checking can
 and cannot guarantee; and how a reflection-driven host workflow replaces
 per-platform SBT setup.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
 
 \end{document}
