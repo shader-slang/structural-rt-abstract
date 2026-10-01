@@ -315,8 +315,8 @@ Cross-platform demo:
 and we actively seek community feedback to stabilize the interface
 design --- there may be gaps our own validation cannot catch. The
 feature ships as an explicitly imported experimental module.
-Version one covers pipeline ray tracing only --- inline ray queries are
-already portable --- and excludes Shader Execution Reordering. The
+The first version does not include Shader Execution Reordering (SER);
+we plan to extend the design to cover it in the near future. The
 Falcor~2 Metal runtime path awaits pipeline ray-tracing support in
 Slang-RHI, and a port of Unreal Engine~5 is planned. The compiler
 cannot validate host-written SBT contents --- the same trust boundary as
