@@ -58,8 +58,8 @@ compiled to every target: D3D12, Vulkan, and OptiX share a model of
 free-standing stage entry points dispatched through a host-built shader
 binding table (SBT), while Metal has no native \emph{miss} or
 \emph{closesthit} stages and no complete SBT record indexing. On every API, a trace call's reachable
-programs are invisible to the shader compiler, leaving that boundary
-unchecked. We present \emph{structural ray tracing}, an experimental
+programs are invisible to the shader compiler, so it cannot validate
+that the two sides' signatures agree. We present \emph{structural ray tracing}, an experimental
 Slang module in which the shader
 declares a \emph{trace program schema} --- the finite, typed set of hit
 groups, \emph{miss} shaders, and \emph{callable} shaders a trace can
@@ -70,11 +70,10 @@ Vulkan, and OptiX while synthesizing Metal's missing dispatch machinery,
 and on every target it checks each trace call against its reachable
 programs. For example, passing a payload type none of them expects
 fails at compile time; on today's native APIs, the same mistake
-surfaces only when the GPU misreads the payload at runtime. A Cornell-box demo runs one Slang
-shader set on all of these APIs with output matching Slang's legacy
-ray-tracing API, and a port of a Falcor~2--based renderer validates the
-design
-at mid-size-renderer scale.
+surfaces only when the GPU misreads the payload at runtime. We use the
+module to build a statically checked, cross-platform Cornell-box demo
+and a mid-size Falcor~2--based renderer, matching the legacy
+ray-tracing API's output and runtime performance.
 \end{abstract}
 
 \begin{CCSXML}
@@ -131,18 +130,40 @@ that index, the dispatched functions can only accept or reject their
 candidate, and \emph{miss}, \emph{closesthit}, and \emph{callable} have
 no stages at all: \emph{miss} and \emph{closesthit} logic is ordinary
 control flow after \texttt{intersect()} returns, and a \emph{callable}
-is an explicit function call the shader makes itself. Three concrete
-gaps remain:
+is an explicit function call the shader makes itself.
+Listing~\ref{lst:gap} shows the difference for \emph{miss} logic.
+
+\begin{lstlisting}[label={lst:gap},caption={The same \emph{miss} logic
+on both models: a driver-dispatched entry point on
+D3D12/Vulkan/OptiX, but ordinary control flow the shader author writes
+after \texttt{intersect()} on Metal.}]
+// D3D12 / Vulkan / OptiX: stages are entry points that the
+// driver selects and dispatches from host-built SBT records.
+[shader("miss")]
+void skyMiss(inout RadiancePayload p) { p.radiance = sky(); }
+// ... reached via:
+TraceRay(scene, flags, mask, sbtOffset, sbtStride, missIndex,
+         ray, p);
+
+// Metal: intersect() simply returns; the shader author writes
+// the miss and closesthit dispatch by hand.
+auto hit = intersector.intersect(ray, scene, functionTable);
+if (hit.type == intersection_type::none) { p.radiance = sky(); }
+else { /* hand-written closesthit selection */ }
+\end{lstlisting}
+
+Three concrete gaps remain:
 
 \begin{itemize}
-\item \textbf{Dispatch-model gap.} No native dispatch reaches
-  \emph{miss} or \emph{closesthit} code, and the traversal table index
-  is not the full SBT
-  record calculation: the trace-to-program mapping lives only in host
-  pipeline setup.
-\item \textbf{Resource mismatch.} Metal's function tables are
-  shader-visible resources that must be declared and bound; the D3D12
-  and Vulkan SBT has no shader-side binding point at all.
+\item \textbf{Dispatch-model gap.} On Metal, no hardware or driver
+  mechanism ever selects \emph{miss} or \emph{closesthit} code ---
+  there is nothing for a compiler to lower a trace's record selection
+  to, and which code should run is knowledge only the host has.
+\item \textbf{Resource mismatch.} The two models bind opposite things:
+  Metal's function tables are ordinary shader-visible resources that
+  the shader must declare and the host must fill, while the D3D12 and
+  Vulkan SBT is an opaque host-side table with no shader-side binding
+  point at all --- so no single declaration style fits both natively.
 \item \textbf{Tag-inference gap.} Every reachable intersection function
   must carry a compatible \texttt{[[intersection(...)]]} tag list ---
   the static signature of the traversal capabilities the function
