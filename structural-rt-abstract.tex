@@ -119,37 +119,55 @@ A \emph{miss} record is instead selected directly by
 $\mathit{missIndex}$, and a \emph{callable} record by the explicit index
 passed to the call; the selected stages then dispatch natively.
 
-Metal overlaps with only the traversal half of this model. During
-traversal it does dispatch through a function table: each
-\emph{candidate hit} --- a tentative intersection not yet accepted as
-the closest --- can invoke a triangle or procedural intersection
-function, Metal's \emph{anyhit}-style filter, selected by the sum of a
-per-instance and a per-geometry table offset. But the trace call
-contributes no $\mathit{sbtStride}$ or $\mathit{sbtOffset}$ analogue to
-that index, the dispatched functions can only accept or reject their
-candidate, and \emph{miss}, \emph{closesthit}, and \emph{callable} have
-no stages at all: \emph{miss} and \emph{closesthit} logic is ordinary
-control flow after \texttt{intersect()} returns, and a \emph{callable}
-is an explicit function call the shader makes itself.
-Listing~\ref{lst:gap} shows the difference for \emph{miss} logic.
+Metal has no driver-selected ray-tracing stages beyond its
+\emph{intersection functions}. During traversal, each \emph{candidate
+hit} --- a tentative intersection not yet accepted as the closest ---
+may invoke one such function from an intersection function table. For a
+triangle, the function accepts or rejects the candidate (and may end the
+search or update the payload), which is the job of an \emph{anyhit}
+shader; for procedural geometry it also computes the hit distance,
+combining the jobs of \emph{intersection} and \emph{anyhit} shaders.
+With Metal~3 intersection function tables --- the target of our first
+version --- the table row is the sum of a per-instance and a
+per-geometry offset, with no $\mathit{sbtStride}$ or
+$\mathit{sbtOffset}$ contribution from the trace call. Nothing is
+selected through the SBT for the remaining stages: \emph{miss} and
+\emph{closesthit} logic is ordinary control flow after
+\texttt{intersect()} returns, and a \emph{callable} is an index into a
+visible function table that the shader calls itself.
+Listing~\ref{lst:gap} contrasts the two models.
 
-\begin{lstlisting}[label={lst:gap},caption={The same \emph{miss} logic
-on both models: a driver-dispatched entry point on
-D3D12/Vulkan/OptiX, but ordinary control flow the shader author writes
-after \texttt{intersect()} on Metal.}]
-// D3D12 / Vulkan / OptiX: stages are entry points that the
-// driver selects and dispatches from host-built SBT records.
+\begin{lstlisting}[label={lst:gap},caption={The same \emph{anyhit} and
+\emph{miss} logic on both models. D3D12/Vulkan/OptiX select stage entry
+points from SBT records; Metal runs a triangle intersection function in
+the \emph{anyhit} role and leaves \emph{miss} to code written after
+\texttt{intersect()}.}]
+// D3D12 / Vulkan / OptiX: anyhit and miss are stage entry
+// points that the driver selects from host-built SBT records.
+[shader("anyhit")]
+void alphaTest(inout Payload p,
+               BuiltInTriangleIntersectionAttributes a)
+{ if (alpha(a.barycentrics) < 0.5) IgnoreHit(); }
+
 [shader("miss")]
-void skyMiss(inout RadiancePayload p) { p.radiance = sky(); }
-// ... reached via:
+void skyMiss(inout Payload p) { p.radiance = sky(); }
+
 TraceRay(scene, flags, mask, sbtOffset, sbtStride, missIndex,
          ray, p);
 
-// Metal: intersect() simply returns; the shader author writes
-// the miss and closesthit dispatch by hand.
-auto hit = intersector.intersect(ray, scene, functionTable);
-if (hit.type == intersection_type::none) { p.radiance = sky(); }
-else { /* hand-written closesthit selection */ }
+// Metal: no anyhit stage. A triangle intersection function does
+// the anyhit job (its bool return accepts or rejects); its table
+// row is instance offset + geometry offset only. The function,
+// the intersector, and the table must agree on their tags.
+[[intersection(triangle, triangle_data, instancing)]]
+bool alphaTest(float2 b [[barycentric_coord]])
+{ return alpha(b) >= 0.5; }
+
+intersector<triangle_data, instancing> isect;
+auto hit = isect.intersect(ray, scene, table);
+if (hit.type == intersection_type::none)
+    p.radiance = sky();            // miss, written by hand
+else { /* closesthit selection, written by hand */ }
 \end{lstlisting}
 
 Three concrete gaps remain:
@@ -266,11 +284,17 @@ buffer that Metal requires, bound through reflection.
 
 \textbf{Native where native exists, synthesized where it does not.} On
 D3D12, Vulkan, and OptiX, stage structs lower to ordinary native entry
-points and native SBT dispatch. On Metal, the same schema drives
-synthesis of per-payload intersection-function-table dispatchers,
-visible-function tables, a compiler-owned record buffer whose lookup
-evaluates the standard hit-record index formula at runtime, and fully
-inferred \texttt{[[intersection(...)]]} tag lists.
+points and native SBT dispatch. On Metal, which has no separate
+\emph{anyhit} stage and no SBT-selected \emph{intersection} stage, the
+compiler synthesizes intersection functions that reproduce their
+semantics: for each payload type that needs candidate logic, one
+generated dispatcher per primitive kind, installed at a fixed table row,
+evaluates the standard hit-record index formula to find the candidate's
+SBT record, then runs that hit group's \emph{anyhit} or
+\emph{intersection} logic. The same schema also yields visible-function
+tables for \emph{miss}, \emph{closesthit}, and \emph{callable}, a
+compiler-owned record buffer, and fully inferred
+\texttt{[[intersection(...)]]} tag lists.
 
 \textbf{Separate compilation.} A schema section may be left open, to be
 completed at Slang link time by every linked type that implements a
