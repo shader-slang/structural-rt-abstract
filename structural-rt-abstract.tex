@@ -119,8 +119,8 @@ A \emph{miss} record is instead selected directly by
 $\mathit{missIndex}$, and a \emph{callable} record by the explicit index
 passed to the call; the selected stages then dispatch natively.
 
-Metal builds ray tracing from a different set of primitives, and mapping
-the native model above onto it exposes three gaps.
+Metal assembles ray tracing from a different set of building blocks, and
+mapping the native model above onto it exposes three gaps.
 
 \textbf{Dispatch-model gap.} Metal's hardware selects only
 \emph{intersection functions}, and never \emph{miss}, \emph{closesthit},
